@@ -7,12 +7,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
 @WebServlet(value = "/register")
-@Slf4j
 public class RegisterServlet extends HttpServlet {
     private final UsersService usersService = new UsersService();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -24,7 +22,7 @@ public class RegisterServlet extends HttpServlet {
 
     private void processPostRegisterServlet(HttpServletRequest req, HttpServletResponse resp) {
         prepareResponse(resp);
-        String username = req.getParameter("username");
+        String username = req.getParameter("login");
         String password = req.getParameter("password");
 
         try {
@@ -35,14 +33,14 @@ public class RegisterServlet extends HttpServlet {
                 mapper.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
             }
 
-            if (usersService.getUser(username).isEmpty()){
+            if (usersService.getUser(username).isPresent()){
                 log("Username already exists");
                 resp.setStatus(409);
                 mapper.writeValue(resp.getWriter(), new ErrorResponse(409,"Username already exists"));
             }else usersService.registerUser(username, password);
         }catch (Exception e){
             resp.setStatus(500);
-            handleResponseError(resp, log, mapper, e, 500, "Internal Server Error");
+//            handleResponseError(resp, log, mapper, e, 500, "Internal Server Error");
         }
     }
 }

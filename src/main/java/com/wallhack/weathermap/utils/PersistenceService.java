@@ -8,7 +8,7 @@ public class PersistenceService {
     private final EntityManagerFactory emf;
 
     private PersistenceService() {
-        this.emf = Persistence.createEntityManagerFactory("hibernate.cf.xml");
+        this.emf = Persistence.createEntityManagerFactory("WeatherAppPU");
     }
 
     public static PersistenceService getInstance() {
