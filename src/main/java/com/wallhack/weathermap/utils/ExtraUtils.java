@@ -16,6 +16,12 @@ public class ExtraUtils {
         resp.setCharacterEncoding("UTF-8");
     }
 
+    public static void headerSetter(HttpServletResponse resp){
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "POST");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
     public static void handleResponseError(HttpServletResponse resp, Logger logger, ObjectMapper mapper, Exception e, int statusCode, String errorMessage) {
         logger.error("Error processing request", e);
         resp.setStatus(statusCode);
