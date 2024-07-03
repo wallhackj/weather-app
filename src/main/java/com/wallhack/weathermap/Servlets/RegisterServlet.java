@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
+import static com.wallhack.weathermap.utils.ExtraUtils.responseWithMethod;
 
 @WebServlet(value = "/register")
 public class RegisterServlet extends HttpServlet {
@@ -19,14 +20,7 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        headerSetter(resp);
-
-        try {
-            processPostRegisterServlet(req, resp);
-        }catch (Exception e){
-//            handleResponseError();
-        }
-
+        responseWithMethod(this::processPostRegisterServlet, req, resp);
     }
 
     private void processPostRegisterServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

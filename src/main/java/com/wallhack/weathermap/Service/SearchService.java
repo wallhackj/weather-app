@@ -12,28 +12,35 @@ import java.util.Optional;
 import static com.wallhack.weathermap.utils.API_KEY_ACCESS.apiKey;
 
 public class SearchService {
-    //      https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
-    private final String apiURL = "https://api.openweathermap.org/data/2.5/weather?q=";
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public Optional<JsonNode> searchByCity(String city){
+    public Optional<JsonNode> searchWeatherByCity(String city){
 //      https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
-        Request request = new Request
-                .Builder()
-                .url(apiURL + city + "&appid=" + apiKey)
-                .build();
-
-        return getJsonNode(request);
+        return getJsonNode(getRequest("weather?" + "q=" + city + "&appid="));
     }
 
-    public Optional<JsonNode> searchByCoordinates(double lat, double lon){
+    public Optional<JsonNode> searchWeatherByCoordinates(double lat, double lon){
 //      https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
-        Request request = new Request
-                .Builder().url(apiURL + "lat=" + lat + "&lon=" + lon + "&appid=" + apiKey)
-                .build();
+        return getJsonNode(getRequest("weather?" + "lat=" + lat + "&lon=" + lon + "&appid="));
+    }
 
-        return getJsonNode(request);
+    public Optional<JsonNode> hourlyForecast4DaysByCoordinates(double lat, double lon){
+//      https://pro.openweathermap.org/data/2.5/forecast/hourly?lat={lat}&lon={lon}&appid={API key}
+        return getJsonNode(getRequest("forecast/hourly?" + "lat=" + lat + "&lon=" + lon + "&appid="));
+    }
+
+    public Optional<JsonNode> forecast5Day3HoursByCity(String city){
+//      api.openweathermap.org/data/2.5/forecast?q={city name}&appid={API key}
+        return getJsonNode(getRequest("forecast?q=" + city + "&appid="));
+    }
+
+    private Request getRequest(String url){
+        String apiURL = "https://api.openweathermap.org/data/2.5/";
+        return new Request
+                .Builder()
+                .url(apiURL + url + apiKey)
+                .build();
     }
 
     private Optional<JsonNode> getJsonNode(Request request) {

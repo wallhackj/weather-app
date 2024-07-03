@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
+import static com.wallhack.weathermap.utils.ExtraUtils.responseWithMethod;
 
 @WebServlet(value = "/search")
 public class SearchServlet extends HttpServlet {
@@ -27,24 +28,12 @@ public class SearchServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        headerSetter(resp);
-
-        try {
-            processGetSearchServlet(req, resp);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        responseWithMethod(this::processGetSearchServlet, req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        headerSetter(resp);
-
-        try {
-            processPostSearchServlet(req, resp);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        responseWithMethod(this::processPostSearchServlet, req, resp);
     }
 
     private void processPostSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException {
@@ -103,9 +92,9 @@ public class SearchServlet extends HttpServlet {
             double latitude = Double.parseDouble(coordinates[0]);
             double longitude = Double.parseDouble(coordinates[1]);
 
-            jsonResponse = searchService.searchByCoordinates(latitude, longitude);
+            jsonResponse = searchService.searchWeatherByCoordinates(latitude, longitude);
         }else {
-            jsonResponse = searchService.searchByCity(location);
+            jsonResponse = searchService.searchWeatherByCity(location);
         }
 
         if (jsonResponse.isPresent()) {

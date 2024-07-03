@@ -3,11 +3,13 @@ C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\D
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\LoginServlet.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\UsersDAO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\LocationsPOJO.java
+C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\utils\API_KEY_ACCESS.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\LocationsDAO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\SessionsPOJO.java
-C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\utils\EntityManagerConsumer.java
+C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Service\SearchService.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\SessionsDAO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Service\SessionsService.java
+C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\MainPageServlet.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\UsersPOJO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Service\LocationsService.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\ICRUDContract.java
@@ -16,5 +18,6 @@ C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\u
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\ICRUDLocations.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Service\UsersService.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\ICRUDSessions.java
+C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\SearchServlet.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\ICRUDUsers.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\utils\PersistenceService.java

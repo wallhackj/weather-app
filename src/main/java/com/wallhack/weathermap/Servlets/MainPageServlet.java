@@ -7,22 +7,14 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-import static com.wallhack.weathermap.utils.ExtraUtils.headerSetter;
-import static com.wallhack.weathermap.utils.ExtraUtils.prepareResponse;
+import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
 @WebServlet(value = "/index")
 public class MainPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        headerSetter(resp);
-
-        try {
-            processGetMainPageServlet(req, resp);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
+        responseWithMethod(this::processGetMainPageServlet, req, resp);
     }
 
     private void processGetMainPageServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
