@@ -30,7 +30,7 @@ public class LoginServlet extends HttpServlet {
 
     private void processGetLoginServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         prepareResponse(resp);
-
+//      /login?login=******.com&password=*****
         String username = req.getParameter("login");
         String password = req.getParameter("password");
 

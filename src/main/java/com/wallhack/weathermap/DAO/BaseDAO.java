@@ -1,6 +1,5 @@
 package com.wallhack.weathermap.DAO;
 
-import com.wallhack.weathermap.utils.EntityManagerConsumer;
 import com.wallhack.weathermap.utils.PersistenceService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -9,6 +8,7 @@ import jakarta.persistence.EntityTransaction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public abstract class BaseDAO<T> implements ICRUDContract<T> {
     protected final EntityManagerFactory emf = PersistenceService.getInstance().getEntityManagerFactory();
@@ -59,7 +59,7 @@ public abstract class BaseDAO<T> implements ICRUDContract<T> {
         return entities;
     }
 
-    private void executeInsideTransaction(EntityManagerConsumer action) {
+    private void executeInsideTransaction(Consumer<EntityManager> action) {
         try (EntityManager entityManager = emf.createEntityManager()) {
             EntityTransaction transaction = entityManager.getTransaction();
             try {
