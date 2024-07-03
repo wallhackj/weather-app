@@ -36,6 +36,53 @@ public class SearchServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        headerSetter(resp);
+
+        try {
+            processPostSearchServlet(req, resp);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void processPostSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException {
+        prepareResponse(resp);
+
+        var userID = req.getParameter("userId");
+        var name = req.getParameter("name");
+        var latitude = req.getParameter("lat");
+        var longitude = req.getParameter("lon");
+
+        if (isEmpty(userID, name) && isEmpty(latitude, longitude)) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Bad Request"));
+        }
+
+        Optional<LocationsPOJO> currentLocation = locationsService.findLocationByName(name);
+
+        if (currentLocation.isEmpty()) {
+            Optional<UsersPOJO> user = usersDAO.findById(Integer.parseInt(userID));
+
+            if (user.isPresent()) {
+                double lat = Double.parseDouble(latitude);
+                double lon = Double.parseDouble(longitude);
+
+                var newLocation = new LocationsPOJO(lat, lon, name, user.get());
+                resp.setStatus(HttpServletResponse.SC_OK);
+                mapper.writeValue(resp.getWriter(), newLocation);
+                locationsService.addLocation(newLocation);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                mapper.writeValue(resp.getWriter(), new ErrorResponse(404, "User not found"));
+            }
+        }else {
+            resp.setStatus(200);
+            mapper.writeValue(resp.getWriter(),currentLocation.get());
+        }
+    }
+
     private void processGetSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException {
         prepareResponse(resp);
 
@@ -43,11 +90,11 @@ public class SearchServlet extends HttpServlet {
 
 //      /search?location=Chisinau or /search?location=3.14%2C%203.14
         var location = req.getParameter("location");
-        var userID = req.getParameter("userId");
 
-        if (isEmpty(location,userID)){
+        if (isEmpty(location,"1")){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Param 'location and user' is required"));
+            return;
         }
 
         if (Character.isDigit(location.charAt(0))) {
@@ -56,46 +103,15 @@ public class SearchServlet extends HttpServlet {
             double latitude = Double.parseDouble(coordinates[0]);
             double longitude = Double.parseDouble(coordinates[1]);
 
-            Optional<LocationsPOJO> locationByCoordinates = locationsService.findLocationByCoordinates(latitude, longitude);
-            if (locationByCoordinates.isPresent()) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                mapper.writeValue(resp.getWriter(), locationByCoordinates.get());
-            }
             jsonResponse = searchService.searchByCoordinates(latitude, longitude);
         }else {
-            Optional<LocationsPOJO> locationByName = locationsService.findLocationByName(location);
-
-            if (locationByName.isPresent()) {
-                resp.setStatus(HttpServletResponse.SC_OK);
-                mapper.writeValue(resp.getWriter(), locationByName.get());
-            }
             jsonResponse = searchService.searchByCity(location);
         }
 
         if (jsonResponse.isPresent()) {
-        var result = jsonResponse.get();
-        Optional<UsersPOJO> user = usersDAO.findById(Integer.parseInt(userID));
+        resp.setStatus(HttpServletResponse.SC_OK);
+        mapper.writeValue(resp.getWriter(), jsonResponse.get());
 
-            if (user.isPresent()){
-                resp.setStatus(HttpServletResponse.SC_OK);
-
-                JsonNode coordNode = result.get("coord");
-                String name = result.get("name") != null ? result.get("name").asText() : "";
-                Double lat = coordNode != null ? coordNode.get("lat") != null ? Double.parseDouble(coordNode.get("lat").asText()) : null : null;
-                Double lon = coordNode != null ? coordNode.get("lon") != null ? Double.parseDouble(coordNode.get("lon").asText()) : null : null;
-
-                // Verifică dacă toate datele necesare sunt prezente înainte de adăugarea în locationsService
-                if (lat != null && lon != null && !name.isEmpty()) {
-                    mapper.writeValue(resp.getWriter(), result);
-                    locationsService.addLocation(new LocationsPOJO(lat, lon, name, user.get()));
-                } else {
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Missing or invalid data in response"));
-                }
-            } else {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                mapper.writeValue(resp.getWriter(), new ErrorResponse(404, "User not found"));
-            }
         }else {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
