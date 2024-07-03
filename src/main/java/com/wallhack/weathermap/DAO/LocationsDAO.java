@@ -2,6 +2,7 @@ package com.wallhack.weathermap.DAO;
 
 import com.wallhack.weathermap.Model.LocationsPOJO;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,8 @@ public class LocationsDAO extends BaseDAO<LocationsPOJO> implements ICRUDLocatio
                     , LocationsPOJO.class);
             query.setParameter("name", name);
             location = query.getSingleResult();
+        }catch (NoResultException e) {
+            return Optional.empty();
         }catch (Exception e) {
             e.printStackTrace();
         }
