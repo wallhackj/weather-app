@@ -49,8 +49,8 @@ public class RegisterServlet extends HttpServlet {
             resp.setStatus(200);
             mapper.writeValue(resp.getWriter(), registeredUser);
         } else {
-            resp.setStatus(500);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Failed to retrieve registered user"));
+            resp.setStatus(404);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(404, "Failed to retrieve registered user"));
         }
 
     }

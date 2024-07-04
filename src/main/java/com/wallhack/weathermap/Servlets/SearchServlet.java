@@ -1,8 +1,8 @@
 package com.wallhack.weathermap.Servlets;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.DAO.UsersDAO;
+import com.wallhack.weathermap.Model.CurrentWeatherDTO;
 import com.wallhack.weathermap.Model.LocationsPOJO;
 import com.wallhack.weathermap.Model.UsersPOJO;
 import com.wallhack.weathermap.Service.LocationsService;
@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
@@ -49,12 +50,12 @@ public class SearchServlet extends HttpServlet {
             mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Bad Request"));
         }
 
+        var id = Long.parseLong(userID);
+        Optional<UsersPOJO> user = usersDAO.findById(id);
         Optional<LocationsPOJO> currentLocation = locationsService.findLocationByName(name);
 
-        if (currentLocation.isEmpty()) {
-            Optional<UsersPOJO> user = usersDAO.findById(Integer.parseInt(userID));
-
-            if (user.isPresent()) {
+        if (user.isPresent() && currentLocation.isPresent()) {
+            if (currentLocation.get().getUserId().getId() != id) {
                 double lat = Double.parseDouble(latitude);
                 double lon = Double.parseDouble(longitude);
 
@@ -62,22 +63,25 @@ public class SearchServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_OK);
                 mapper.writeValue(resp.getWriter(), newLocation);
                 locationsService.addLocation(newLocation);
-            } else {
+            }else {
+                resp.setStatus(HttpServletResponse.SC_OK);
+                mapper.writeValue(resp.getWriter(),currentLocation.get());
+            }
+        }else {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 mapper.writeValue(resp.getWriter(), new ErrorResponse(404, "User not found"));
             }
-        }else {
-            resp.setStatus(200);
-            mapper.writeValue(resp.getWriter(),currentLocation.get());
-        }
+
     }
 
-    private void processGetSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException {
+    private void processGetSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException, URISyntaxException, InterruptedException {
         prepareResponse(resp);
 
-        Optional<JsonNode> jsonResponse;
+        Optional<CurrentWeatherDTO> currentWeatherDTO;
 
 //      /search?location=Chisinau or /search?location=3.14%2C%203.14
+//      /search?location=Chisinau,MD
+
         var location = req.getParameter("location");
 
         if (isEmpty(location,"1")){
@@ -92,14 +96,20 @@ public class SearchServlet extends HttpServlet {
             double latitude = Double.parseDouble(coordinates[0]);
             double longitude = Double.parseDouble(coordinates[1]);
 
-            jsonResponse = searchService.searchWeatherByCoordinates(latitude, longitude);
+            currentWeatherDTO = searchService.searchWeatherByCoordinates(latitude, longitude);
         }else {
-            jsonResponse = searchService.searchWeatherByCity(location);
+            if (location.contains(",")){
+                String[] parts = location.split(",", 2);
+                String city = parts[0].trim();
+                String region = parts[1].trim();
+                currentWeatherDTO = searchService.searchWeatherByCityAndRegion(city, region);
+
+            }else currentWeatherDTO = searchService.searchWeatherByCity(location);
         }
 
-        if (jsonResponse.isPresent()) {
-        resp.setStatus(HttpServletResponse.SC_OK);
-        mapper.writeValue(resp.getWriter(), jsonResponse.get());
+        if (currentWeatherDTO.isPresent()) {
+            resp.setStatus(HttpServletResponse.SC_OK);
+            mapper.writeValue(resp.getWriter(), currentWeatherDTO.get());
 
         }else {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
