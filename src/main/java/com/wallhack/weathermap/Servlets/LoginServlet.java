@@ -9,8 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.wallhack.weathermap.utils.ExtraUtils.headerSetter;
-import static com.wallhack.weathermap.utils.ExtraUtils.prepareResponse;
+import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
 @WebServlet(value = "/login")
 public class LoginServlet extends HttpServlet {
@@ -19,13 +18,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        headerSetter(resp);
-
-        try {
-            processGetLoginServlet(req, resp);
-        }catch (Exception e){
-//            handleResponseError();
-        }
+        responseWithMethod(this::processGetLoginServlet, req, resp);
     }
 
     private void processGetLoginServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

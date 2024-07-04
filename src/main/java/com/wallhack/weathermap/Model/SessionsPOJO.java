@@ -3,6 +3,7 @@ package com.wallhack.weathermap.Model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.Date;
 import java.util.UUID;
@@ -13,7 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class SessionsPOJO{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidGenerator(style = UuidGenerator.Style.TIME)
+    @GeneratedValue
     private UUID id;
 
     @ManyToOne
