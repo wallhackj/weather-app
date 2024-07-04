@@ -16,7 +16,7 @@ public class LocationsService {
         return locationsDAO.findAll();
     }
 
-    public List<LocationsPOJO> getLocationByUserId(long id) {
+    public List<LocationsPOJO> getAllLocationByUserId(long id) {
         return locationsDAO.getLocationByUserId(id);
     }
 

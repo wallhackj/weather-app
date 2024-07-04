@@ -4,21 +4,17 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "LocationsPOJO")
+@Entity(name = "Locations")
 @Table(name = "locations")
 @Data
 @NoArgsConstructor
-public class LocationsPOJO{
+public class LocationsPOJO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "userId", nullable = false)
-    private UsersPOJO userId;
 
     @Column(nullable = false)
     private double latitude;
@@ -26,10 +22,14 @@ public class LocationsPOJO{
     @Column(nullable = false)
     private double longitude;
 
-    public LocationsPOJO(double latitude, double longitude, String name, UsersPOJO userId) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", nullable = false)
+    private UsersPOJO user;
+
+    public LocationsPOJO(double latitude, double longitude, String name, UsersPOJO user) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.name = name;
-        this.userId = userId;
+        this.user = user;
     }
 }

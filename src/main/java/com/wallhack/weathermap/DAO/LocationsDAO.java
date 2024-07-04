@@ -19,8 +19,9 @@ public class LocationsDAO extends BaseDAO<LocationsPOJO> implements ICRUDLocatio
         List<LocationsPOJO> locations = new ArrayList<>();
 
         try (EntityManager entityManager = emf.createEntityManager()){
-            TypedQuery<LocationsPOJO> query = entityManager.createQuery("SELECT u FROM LocationsPOJO u WHERE u.userId = :userId"
-                    , LocationsPOJO.class);
+            TypedQuery<LocationsPOJO> query = entityManager
+                    .createQuery("SELECT u FROM Locations u JOIN FETCH u.user l WHERE l.id = :userId"
+                            , LocationsPOJO.class);
             query.setParameter("userId", userId);
             locations = query.getResultList();
         }catch (Exception e) {
@@ -35,7 +36,7 @@ public class LocationsDAO extends BaseDAO<LocationsPOJO> implements ICRUDLocatio
         LocationsPOJO location = null;
 
         try (EntityManager entityManager = emf.createEntityManager()){
-            TypedQuery<LocationsPOJO> query = entityManager.createQuery("SELECT u FROM LocationsPOJO u WHERE u.name = :name"
+            TypedQuery<LocationsPOJO> query = entityManager.createQuery("SELECT u FROM Locations u WHERE u.name = :name"
                     , LocationsPOJO.class);
             query.setParameter("name", name);
             location = query.getSingleResult();
@@ -54,7 +55,7 @@ public class LocationsDAO extends BaseDAO<LocationsPOJO> implements ICRUDLocatio
 
         try (EntityManager entityManager = emf.createEntityManager()){
             TypedQuery<LocationsPOJO> query = entityManager
-                    .createQuery("SELECT u FROM LocationsPOJO u WHERE u.longitude = :longitude " +
+                    .createQuery("SELECT u FROM Locations u WHERE u.longitude = :longitude " +
                                     "AND u.latitude = :latitude"
                     , LocationsPOJO.class);
             query.setParameter("longitude", longitude);
