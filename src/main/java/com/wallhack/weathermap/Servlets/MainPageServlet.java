@@ -2,16 +2,14 @@ package com.wallhack.weathermap.Servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.Model.APIWeatherDTO;
+import com.wallhack.weathermap.Model.CookieLocation;
 import com.wallhack.weathermap.Model.LocationsPOJO;
-import com.wallhack.weathermap.Model.UsersPOJO;
 import com.wallhack.weathermap.Service.LocationsService;
 import com.wallhack.weathermap.Service.SearchService;
-import com.wallhack.weathermap.Service.UsersService;
+import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -25,10 +23,11 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 public class MainPageServlet extends HttpServlet {
     private final ObjectMapper mapper = new ObjectMapper();
     private final LocationsService locationsService = new LocationsService();
-    private final UsersService usersService = new UsersService();
     private final SearchService searchService = new SearchService();
+    private final SessionsService sessionsService =  new SessionsService();
 
     public MainPageServlet() {
+        this.sessionsService.deleteExpiredSessions();
         this.mapper.findAndRegisterModules();
     }
 
@@ -39,38 +38,27 @@ public class MainPageServlet extends HttpServlet {
 
     private void processGetMainPageServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, URISyntaxException, InterruptedException {
         prepareResponse(resp);
+        sessionsService.processCookies(this::allLocationsRender, resp, req, mapper, sessionsService);
+    }
 
-        var userId = req.getParameter("id");
+    private void allLocationsRender(HttpServletResponse resp, CookieLocation cookieLocation) throws IOException, URISyntaxException, InterruptedException {
+        List<LocationsPOJO> allLocationsOfUser = locationsService.getAllLocationByUserId(cookieLocation.id());
 
-        if (isEmpty(userId, "1")){
+        if (allLocationsOfUser.isEmpty()) {
             resp.setStatus(400);
-            log("Invalid username/password");
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
-            return;
-        }
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "User dont have any location"));
+        } else {
+            List<APIWeatherDTO> allWeatherInfo = new ArrayList<>();
 
-        var id = Long.parseLong(userId);
-        Optional<UsersPOJO> user = usersService.findUserById(id);
-
-        if (user.isPresent()){
-            List<LocationsPOJO> allLocationsOfUser = locationsService.getAllLocationByUserId(id);
-
-            if (allLocationsOfUser.isEmpty()){
-                resp.setStatus(400);
-                mapper.writeValue(resp.getWriter(), new ErrorResponse(400,"User dont have any location"));
-            }else {
-                List<APIWeatherDTO> allWeatherInfo = new ArrayList<>();
-
-                for (LocationsPOJO location : allLocationsOfUser){
-                    Optional<APIWeatherDTO> locationsPOJO = searchService
-                            .searchWeatherByCoordinates(location.getLatitude(), location.getLongitude());
-                    locationsPOJO.ifPresent(allWeatherInfo::add);
-                }
-
-                resp.setStatus(200);
-                mapper.writeValue(resp.getWriter(), allWeatherInfo);
-
+            for (LocationsPOJO location : allLocationsOfUser) {
+                Optional<APIWeatherDTO> locationsPOJO = searchService
+                        .searchWeatherByCoordinates(location.getLatitude(), location.getLongitude());
+                locationsPOJO.ifPresent(allWeatherInfo::add);
             }
+
+            resp.setStatus(200);
+            mapper.writeValue(resp.getWriter(), allWeatherInfo);
+
         }
     }
 }

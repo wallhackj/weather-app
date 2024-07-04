@@ -3,6 +3,7 @@ package com.wallhack.weathermap.Servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.Model.APIForecastDTO;
 import com.wallhack.weathermap.Service.SearchService;
+import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -21,6 +22,8 @@ public class ForecastServlet extends HttpServlet {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public ForecastServlet() {
+        SessionsService sessionsService =  new SessionsService();
+        sessionsService.deleteExpiredSessions();
         this.mapper.findAndRegisterModules();
     }
 
