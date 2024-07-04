@@ -1,62 +1,58 @@
 package com.wallhack.weathermap.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.wallhack.weathermap.Model.CurrentWeatherDTO;
+import com.wallhack.weathermap.Model.ForecastDTO;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import static com.wallhack.weathermap.utils.API_KEY_ACCESS.apiKey;
 
 public class SearchService {
-    private final OkHttpClient httpClient = new OkHttpClient();
-    private final ObjectMapper mapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = new JsonMapper();
 
-    public Optional<JsonNode> searchWeatherByCity(String city){
-//      https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
-        return getJsonNode(getRequest("weather?" + "q=" + city + "&appid="));
+    public Optional<CurrentWeatherDTO> searchWeatherByCity(String city) throws URISyntaxException, IOException, InterruptedException {
+//     https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
+       var endpoint = "weather?" + "q=" + city + "&appid=";
+       return sendRequest(endpoint, CurrentWeatherDTO.class);
     }
 
-    public Optional<JsonNode> searchWeatherByCoordinates(double lat, double lon){
+    public Optional<CurrentWeatherDTO> searchWeatherByCityAndRegion(String city, String region) throws URISyntaxException, IOException, InterruptedException {
+//       https://api.openweathermap.org/data/2.5/weather?q=Odessa,us&appid={API key}
+         var endpoint = "weather?" + "q=" + city + "," + region + "&appid=";
+         return sendRequest(endpoint, CurrentWeatherDTO.class);
+    }
+
+    public Optional<CurrentWeatherDTO> searchWeatherByCoordinates(double lat, double lon) throws URISyntaxException, IOException, InterruptedException {
 //      https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
-        return getJsonNode(getRequest("weather?" + "lat=" + lat + "&lon=" + lon + "&appid="));
+        var endpoint = "weather?" + "lat=" + lat + "&lon=" + lon + "&appid=";
+        return sendRequest(endpoint, CurrentWeatherDTO.class);
     }
 
-    public Optional<JsonNode> hourlyForecast4DaysByCoordinates(double lat, double lon){
-//      https://pro.openweathermap.org/data/2.5/forecast/hourly?lat={lat}&lon={lon}&appid={API key}
-        return getJsonNode(getRequest("forecast/hourly?" + "lat=" + lat + "&lon=" + lon + "&appid="));
-    }
-
-    public Optional<JsonNode> forecast5Day3HoursByCity(String city){
+    public Optional<ForecastDTO> forecast5Day3HoursByCity(String city) throws URISyntaxException, IOException, InterruptedException {
 //      api.openweathermap.org/data/2.5/forecast?q={city name}&appid={API key}
-        return getJsonNode(getRequest("forecast?q=" + city + "&appid="));
+        var endpoint = "forecast?q=" + city + "&appid=";
+        return sendRequest(endpoint, ForecastDTO.class);
     }
 
-    private Request getRequest(String url){
-        String apiURL = "https://api.openweathermap.org/data/2.5/";
-        return new Request
-                .Builder()
-                .url(apiURL + url + apiKey)
+    public Optional<ForecastDTO> forecast5Day3HoursByCityAndRegion(String city, String region) throws URISyntaxException, IOException, InterruptedException {
+//      api.openweathermap.org/data/2.5/forecast?q=München,DE&appid={API key}
+        var endpoint = "forecast?q=" + city + "," + region + "&appid=";
+        return sendRequest(endpoint, ForecastDTO.class);
+    }
+
+    private <T> Optional<T> sendRequest(String endpoint, Class<T> entityClass) throws URISyntaxException, IOException, InterruptedException {
+        var request = HttpRequest.newBuilder()
+                .uri(new URI("https://api.openweathermap.org/data/2.5/" + endpoint + apiKey))
+                .GET()
                 .build();
+        HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        return Optional.of(jsonMapper.readValue(response.body(), entityClass));
     }
-
-    private Optional<JsonNode> getJsonNode(Request request) {
-        try (Response response = httpClient.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
-            }
-            if (response.body() != null) {
-                return Optional.of(mapper.readTree(response.body().string()));
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
-
-
 }

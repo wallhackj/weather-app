@@ -1,11 +1,10 @@
 package com.wallhack.weathermap.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 public class ExtraUtils {
-
     public static boolean isEmpty(String str, String str2) {
         return str == null || str2 == null || str.isEmpty() || str2.isEmpty();
     }
@@ -15,6 +14,7 @@ public class ExtraUtils {
         resp.setCharacterEncoding("UTF-8");
     }
 
+
     public static void headerSetter(HttpServletResponse resp){
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "POST");
@@ -22,7 +22,7 @@ public class ExtraUtils {
     }
 
     public static void responseWithMethod(ServletProcessor processor, HttpServletRequest req, HttpServletResponse resp) {
-        headerSetter(resp);
+//        headerSetter(resp);
         try {
             processor.process(req, resp);
         } catch (Exception e) {

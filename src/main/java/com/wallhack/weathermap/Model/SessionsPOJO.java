@@ -18,7 +18,7 @@ public class SessionsPOJO{
     @GeneratedValue
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
     private UsersPOJO userId;
 

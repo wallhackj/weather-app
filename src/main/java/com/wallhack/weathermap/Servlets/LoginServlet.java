@@ -23,9 +23,16 @@ public class LoginServlet extends HttpServlet {
 
     private void processGetLoginServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         prepareResponse(resp);
+
 //      /login?login=******.com&password=*****
         String username = req.getParameter("login");
         String password = req.getParameter("password");
+
+        if (isEmpty(username, password)){
+            resp.setStatus(400);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
+            return;
+        }
 
         var user = usersService.getUser(username);
 
@@ -41,6 +48,5 @@ public class LoginServlet extends HttpServlet {
             resp.setStatus(404);
             mapper.writeValue(resp.getWriter(), new ErrorResponse(404,"User not found"));
         }
-
     }
 }
