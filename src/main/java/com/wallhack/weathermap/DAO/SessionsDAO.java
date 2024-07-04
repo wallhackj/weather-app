@@ -16,7 +16,8 @@ public class SessionsDAO extends BaseDAO<SessionsPOJO> implements ICRUDSessions 
         SessionsPOJO session = null;
 
         try (EntityManager entityManager = emf.createEntityManager()){
-            TypedQuery<SessionsPOJO> query = entityManager.createQuery("SELECT u FROM SessionsPOJO u WHERE u.userId = :userId"
+            TypedQuery<SessionsPOJO> query = entityManager
+                    .createQuery("SELECT u FROM Locations u JOIN FETCH u.user l WHERE l.id = :userId"
                     , SessionsPOJO.class);
             query.setParameter("userId", userId);
             session = query.getSingleResult();

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity(name = "UsersPOJO")
+@Entity(name = "Users")
 @Table(name = "users", indexes = {
         @Index(name = "users_login_key", columnList = "login", unique = true)
 })

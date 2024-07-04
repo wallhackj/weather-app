@@ -2,7 +2,7 @@ package com.wallhack.weathermap.Servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.DAO.UsersDAO;
-import com.wallhack.weathermap.Model.CurrentWeatherDTO;
+import com.wallhack.weathermap.Model.APIWeatherDTO;
 import com.wallhack.weathermap.Model.LocationsPOJO;
 import com.wallhack.weathermap.Model.UsersPOJO;
 import com.wallhack.weathermap.Service.LocationsService;
@@ -21,11 +21,15 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 import static com.wallhack.weathermap.utils.ExtraUtils.responseWithMethod;
 
 @WebServlet(value = "/search")
-public class SearchServlet extends HttpServlet {
+public class SearchWeatherServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
     private final ObjectMapper mapper = new ObjectMapper();
     private final LocationsService locationsService = new LocationsService();
     private final UsersDAO usersDAO = new UsersDAO();
+
+    public SearchWeatherServlet() {
+        this.mapper.findAndRegisterModules();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -48,6 +52,7 @@ public class SearchServlet extends HttpServlet {
         if (isEmpty(userID, name) && isEmpty(latitude, longitude)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Bad Request"));
+            return;
         }
 
         var id = Long.parseLong(userID);
@@ -55,7 +60,7 @@ public class SearchServlet extends HttpServlet {
         Optional<LocationsPOJO> currentLocation = locationsService.findLocationByName(name);
 
         if (user.isPresent() && currentLocation.isPresent()) {
-            if (currentLocation.get().getUserId().getId() != id) {
+            if (currentLocation.get().getUser().getId() != id) {
                 double lat = Double.parseDouble(latitude);
                 double lon = Double.parseDouble(longitude);
 
@@ -77,7 +82,7 @@ public class SearchServlet extends HttpServlet {
     private void processGetSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException, URISyntaxException, InterruptedException {
         prepareResponse(resp);
 
-        Optional<CurrentWeatherDTO> currentWeatherDTO;
+        Optional<APIWeatherDTO> currentWeatherDTO;
 
 //      /search?location=Chisinau or /search?location=3.14%2C%203.14
 //      /search?location=Chisinau,MD
@@ -102,6 +107,7 @@ public class SearchServlet extends HttpServlet {
                 String[] parts = location.split(",", 2);
                 String city = parts[0].trim();
                 String region = parts[1].trim();
+
                 currentWeatherDTO = searchService.searchWeatherByCityAndRegion(city, region);
 
             }else currentWeatherDTO = searchService.searchWeatherByCity(location);

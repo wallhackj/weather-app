@@ -1,8 +1,5 @@
 package com.wallhack.weathermap.Service;
 
-import com.wallhack.weathermap.DAO.BaseDAO;
-import com.wallhack.weathermap.DAO.ICRUDContract;
-import com.wallhack.weathermap.DAO.ICRUDUsers;
 import com.wallhack.weathermap.DAO.UsersDAO;
 import com.wallhack.weathermap.Model.UsersPOJO;
 
@@ -16,8 +13,8 @@ public class UsersService {
         usersDAO.save(new UsersPOJO(username, password));
     }
 
-    public void findUserById(long id) {
-        usersDAO.findById(id);
+    public Optional<UsersPOJO> findUserById(long id) {
+       return usersDAO.findById(id);
     }
 
     public Optional<UsersPOJO> getUser(String username) {

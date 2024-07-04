@@ -1,8 +1,8 @@
 package com.wallhack.weathermap.Service;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.wallhack.weathermap.Model.CurrentWeatherDTO;
-import com.wallhack.weathermap.Model.ForecastDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wallhack.weathermap.Model.APIForecastDTO;
+import com.wallhack.weathermap.Model.APIWeatherDTO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,36 +15,36 @@ import java.util.Optional;
 import static com.wallhack.weathermap.utils.API_KEY_ACCESS.apiKey;
 
 public class SearchService {
-    private final JsonMapper jsonMapper = new JsonMapper();
+    private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    public Optional<CurrentWeatherDTO> searchWeatherByCity(String city) throws URISyntaxException, IOException, InterruptedException {
+    public Optional<APIWeatherDTO> searchWeatherByCity(String city) throws URISyntaxException, IOException, InterruptedException {
 //     https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
        var endpoint = "weather?" + "q=" + city + "&appid=";
-       return sendRequest(endpoint, CurrentWeatherDTO.class);
+       return sendRequest(endpoint, APIWeatherDTO.class);
     }
 
-    public Optional<CurrentWeatherDTO> searchWeatherByCityAndRegion(String city, String region) throws URISyntaxException, IOException, InterruptedException {
+    public Optional<APIWeatherDTO> searchWeatherByCityAndRegion(String city, String region) throws URISyntaxException, IOException, InterruptedException {
 //       https://api.openweathermap.org/data/2.5/weather?q=Odessa,us&appid={API key}
          var endpoint = "weather?" + "q=" + city + "," + region + "&appid=";
-         return sendRequest(endpoint, CurrentWeatherDTO.class);
+         return sendRequest(endpoint, APIWeatherDTO.class);
     }
 
-    public Optional<CurrentWeatherDTO> searchWeatherByCoordinates(double lat, double lon) throws URISyntaxException, IOException, InterruptedException {
+    public Optional<APIWeatherDTO> searchWeatherByCoordinates(double lat, double lon) throws URISyntaxException, IOException, InterruptedException {
 //      https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API key}
         var endpoint = "weather?" + "lat=" + lat + "&lon=" + lon + "&appid=";
-        return sendRequest(endpoint, CurrentWeatherDTO.class);
+        return sendRequest(endpoint, APIWeatherDTO.class);
     }
 
-    public Optional<ForecastDTO> forecast5Day3HoursByCity(String city) throws URISyntaxException, IOException, InterruptedException {
+    public Optional<APIForecastDTO> forecast5Day3HoursByCity(String city) throws URISyntaxException, IOException, InterruptedException {
 //      api.openweathermap.org/data/2.5/forecast?q={city name}&appid={API key}
         var endpoint = "forecast?q=" + city + "&appid=";
-        return sendRequest(endpoint, ForecastDTO.class);
+        return sendRequest(endpoint, APIForecastDTO.class);
     }
 
-    public Optional<ForecastDTO> forecast5Day3HoursByCityAndRegion(String city, String region) throws URISyntaxException, IOException, InterruptedException {
+    public Optional<APIForecastDTO> forecast5Day3HoursByCityAndRegion(String city, String region) throws URISyntaxException, IOException, InterruptedException {
 //      api.openweathermap.org/data/2.5/forecast?q=München,DE&appid={API key}
         var endpoint = "forecast?q=" + city + "," + region + "&appid=";
-        return sendRequest(endpoint, ForecastDTO.class);
+        return sendRequest(endpoint, APIForecastDTO.class);
     }
 
     private <T> Optional<T> sendRequest(String endpoint, Class<T> entityClass) throws URISyntaxException, IOException, InterruptedException {

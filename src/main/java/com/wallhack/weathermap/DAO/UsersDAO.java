@@ -13,7 +13,7 @@ public class UsersDAO extends BaseDAO<UsersPOJO> implements ICRUDUsers {
     @Override
     public Optional<UsersPOJO> getUserByLogin(String login) {
         try (EntityManager entityManager = emf.createEntityManager()){
-            TypedQuery<UsersPOJO> query = entityManager.createQuery("SELECT u FROM UsersPOJO u WHERE u.login = :login", UsersPOJO.class);
+            TypedQuery<UsersPOJO> query = entityManager.createQuery("SELECT u FROM Users u WHERE u.login = :login", UsersPOJO.class);
             query.setParameter("login", login);
             return Optional.ofNullable(query.getSingleResult());
         }catch (Exception e) {
