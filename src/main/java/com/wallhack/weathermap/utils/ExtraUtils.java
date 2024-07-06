@@ -13,15 +13,13 @@ public class ExtraUtils {
         resp.setCharacterEncoding("UTF-8");
     }
 
-
-    public static void headerSetter(HttpServletResponse resp){
+    public static void politicCORS(HttpServletResponse resp){
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "POST");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 
     public static void responseWithMethod(ServletProcessor processor, HttpServletRequest req, HttpServletResponse resp) {
-//        headerSetter(resp);
         try {
             processor.process(req, resp);
         } catch (Exception e) {

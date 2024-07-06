@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Entity(name = "Sessions")
@@ -23,9 +23,9 @@ public class SessionsPOJO{
     private UsersPOJO userId;
 
     @Column(nullable = false)
-    private Date expiresAt;
+    private Timestamp expiresAt;
 
-    public SessionsPOJO(Date expiresAt, UsersPOJO userId) {
+    public SessionsPOJO(Timestamp expiresAt, UsersPOJO userId) {
         this.expiresAt = expiresAt;
         this.userId = userId;
     }
