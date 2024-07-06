@@ -1,6 +1,6 @@
 package com.wallhack.weathermap.Service;
 
-import com.wallhack.weathermap.DAO.LocationsDAO;
+import com.wallhack.weathermap.DAO.Location.LocationsDAO;
 import com.wallhack.weathermap.Model.LocationsPOJO;
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +12,7 @@ public class LocationsService {
         locationsDAO.save(location);
     }
 
-    public List<LocationsPOJO> getLocations() {
+    public List<LocationsPOJO> getAllLocations() {
         return locationsDAO.findAll();
     }
 

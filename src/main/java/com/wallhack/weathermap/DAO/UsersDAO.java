@@ -1,23 +1,30 @@
 package com.wallhack.weathermap.DAO;
 
+import com.wallhack.weathermap.DAO.Base.AdvancedDAO;
 import com.wallhack.weathermap.Model.UsersPOJO;
-import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class UsersDAO extends BaseDAO<UsersPOJO> implements ICRUDUsers {
+public class UsersDAO extends AdvancedDAO<UsersPOJO> {
     public UsersDAO() {
         super(UsersPOJO.class);
     }
 
-    @Override
     public Optional<UsersPOJO> getUserByLogin(String login) {
-        try (EntityManager entityManager = emf.createEntityManager()){
-            TypedQuery<UsersPOJO> query = entityManager.createQuery("SELECT u FROM Users u WHERE u.login = :login", UsersPOJO.class);
-            query.setParameter("login", login);
-            return Optional.ofNullable(query.getSingleResult());
-        }catch (Exception e) {
-            return Optional.empty();
-        }
+        AtomicReference<Optional<UsersPOJO>> result = new AtomicReference<>(Optional.empty());
+
+        executeInsideTransaction(entityManager -> {
+            try {
+                TypedQuery<UsersPOJO> query = entityManager.createQuery("SELECT u FROM UsersPOJO u WHERE u.login = :login", UsersPOJO.class);
+                query.setParameter("login", login);
+                result.set(Optional.ofNullable(query.getSingleResult()));
+            }catch (NoResultException e) {
+                result.set(Optional.empty());
+            }
+        });
+
+        return result.get();
     }
 }
