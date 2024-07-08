@@ -8,7 +8,7 @@ import org.hibernate.annotations.UuidGenerator;
 import java.sql.Timestamp;
 import java.util.UUID;
 
-@Entity(name = "Sessions")
+@Entity(name = "SessionsPOJO")
 @Table(name = "sessions")
 @Data
 @NoArgsConstructor

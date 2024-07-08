@@ -1,10 +1,10 @@
 package com.wallhack.weathermap.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.DAO.SessionsDAO;
-import com.wallhack.weathermap.Model.CookieLocation;
+import com.wallhack.weathermap.DAO.Session.SessionsDAO;
+import com.wallhack.weathermap.Model.DTO.CookieLocation;
 import com.wallhack.weathermap.Model.SessionsPOJO;
-import com.wallhack.weathermap.utils.CookieProcessor;
+import com.wallhack.weathermap.utils.Conectors.CookieProcessor;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public class SessionsService {
     private final SessionsDAO sessionsDAO = new SessionsDAO();
@@ -26,7 +27,7 @@ public class SessionsService {
         sessionsDAO.save(session);
     }
 
-    public Optional<SessionsPOJO> getSessionById(long id) {
+    public Optional<SessionsPOJO> getSessionById(UUID id) {
         return sessionsDAO.findById(id);
     }
 
@@ -34,7 +35,7 @@ public class SessionsService {
         return sessionsDAO.findAll();
     }
 
-    public void deleteSession(long id) {
+    public void deleteSession(UUID id) {
         sessionsDAO.delete(id);
     }
 
@@ -52,7 +53,7 @@ public class SessionsService {
         List<SessionsPOJO> allSessions = sessionsService.getAllSessions();
         for (SessionsPOJO session : allSessions) {
             if (isSessionExpired(session)) {
-                sessionsService.deleteSession(session.getUserId().getId());
+                sessionsService.deleteSession(session.getId());
             }
         }
     }

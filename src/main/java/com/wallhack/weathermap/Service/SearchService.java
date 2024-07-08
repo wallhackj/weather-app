@@ -1,8 +1,8 @@
 package com.wallhack.weathermap.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.Model.APIForecastDTO;
-import com.wallhack.weathermap.Model.APIWeatherDTO;
+import com.wallhack.weathermap.Model.APIDTO.APIForecastDTO;
+import com.wallhack.weathermap.Model.APIDTO.APIWeatherDTO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,7 +12,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-import static com.wallhack.weathermap.utils.API_KEY_ACCESS.apiKey;
+import static com.wallhack.weathermap.utils.Conectors.API_KEY_ACCESS.apiKey;
 
 public class SearchService {
     private final ObjectMapper jsonMapper = new ObjectMapper();
