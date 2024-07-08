@@ -25,7 +25,7 @@ public class UsersService {
         return usersDAO.findAll();
     }
 
-    public void updateUserPassword(UsersPOJO user) {
+    public void updateUser(UsersPOJO user) {
         usersDAO.update(user);
     }
 

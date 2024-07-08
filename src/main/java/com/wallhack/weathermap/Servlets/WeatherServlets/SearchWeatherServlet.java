@@ -10,6 +10,7 @@ import com.wallhack.weathermap.Service.LocationsService;
 import com.wallhack.weathermap.Service.SearchService;
 import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
+import jakarta.persistence.NoResultException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
 import static com.wallhack.weathermap.utils.ExtraUtils.responseWithMethod;
 
-@WebServlet(value = "/search")
+@WebServlet(value = "/search_bar")
 public class SearchWeatherServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -46,7 +47,7 @@ public class SearchWeatherServlet extends HttpServlet {
         responseWithMethod(this::processPostSearchServlet, req, resp);
     }
 
-    private void processPostSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, NumberFormatException, URISyntaxException, InterruptedException {
+    private void processPostSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         prepareResponse(resp);
 
         var name = req.getParameter("name");
@@ -59,8 +60,19 @@ public class SearchWeatherServlet extends HttpServlet {
             return;
         }
 
-        localCookieLocation = new CookieLocation(1, name, Double.parseDouble(latitude), Double.parseDouble(longitude));
-        sessionsService.processCookies(this::addLocationToDB, resp, req, mapper, sessionsService);
+        try {
+            localCookieLocation = new CookieLocation(1, name, Double.parseDouble(latitude), Double.parseDouble(longitude));
+            sessionsService.processCookies(this::addLocationToDB, resp, req, sessionsService);
+        } catch (NoResultException e) {
+            resp.setStatus(403);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
+        } catch (NumberFormatException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Wrong parameters of latitude or longitude"));
+        }catch (IOException | URISyntaxException | InterruptedException e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
+        }
     }
 
     private void addLocationToDB(HttpServletResponse resp, CookieLocation cookieLocation) throws IOException {

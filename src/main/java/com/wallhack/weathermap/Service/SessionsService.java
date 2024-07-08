@@ -1,11 +1,10 @@
 package com.wallhack.weathermap.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.DAO.Session.SessionsDAO;
 import com.wallhack.weathermap.Model.DTO.CookieLocation;
 import com.wallhack.weathermap.Model.SessionsPOJO;
 import com.wallhack.weathermap.utils.Conectors.CookieProcessor;
-import com.wallhack.weathermap.utils.ErrorResponse;
+import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,7 +69,7 @@ public class SessionsService {
         return now.isAfter(expiresAt);
     }
 
-    public void processCookies(CookieProcessor processor, HttpServletResponse resp, HttpServletRequest req, ObjectMapper mapper, SessionsService sessionsService) throws IOException, URISyntaxException, InterruptedException {
+    public void processCookies(CookieProcessor processor, HttpServletResponse resp, HttpServletRequest req, SessionsService sessionsService) throws IOException, URISyntaxException, InterruptedException {
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : req.getCookies()) {
@@ -82,8 +81,7 @@ public class SessionsService {
                         if (sessionsService.getSessionByUserId(id).isPresent()) {
                             processor.proceed(resp,new CookieLocation(id,"1", 1,1));
                         } else {
-                            resp.setStatus(403);
-                            mapper.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
+                            throw new NoResultException("User is not present");
                         }
                     }
                 }

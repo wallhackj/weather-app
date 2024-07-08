@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
-@WebServlet(value = "/forecast")
+@WebServlet(value = "/forecasts")
 public class ForecastServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
     private final ObjectMapper mapper = new ObjectMapper();

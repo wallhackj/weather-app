@@ -3,7 +3,7 @@ package com.wallhack.weathermap.DAO.Base;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class AdvancedDAO<T> extends BaseDAO<T>{
+public abstract class AdvancedDAO<T> extends BaseDAO<T>{
     Class<T> entityClass;
 
     public AdvancedDAO(Class<T> entityClass) {
