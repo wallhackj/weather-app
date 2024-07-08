@@ -1,14 +1,13 @@
 package com.wallhack.weathermap.utils;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class MillisOrLocalDateTimeDeserializer extends LocalDateTimeDeserializer {
@@ -19,14 +18,10 @@ public class MillisOrLocalDateTimeDeserializer extends LocalDateTimeDeserializer
 
     @Override
     public LocalDateTime deserialize(JsonParser parser, DeserializationContext context) throws IOException {
-        if (parser.hasToken(JsonToken.VALUE_NUMBER_INT)) {
-            long value = parser.getValueAsLong();
-            Instant instant = Instant.ofEpochMilli(value);
+        long timestampInSeconds = parser.getValueAsLong();
 
-            return LocalDateTime.ofInstant(instant, ZoneOffset.UTC);
-        }
-
-        return super.deserialize(parser, context);
+        return LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(timestampInSeconds),
+                ZoneId.systemDefault());
     }
-
 }

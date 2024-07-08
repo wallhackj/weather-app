@@ -10,8 +10,7 @@ CREATE TABLE IF NOT EXISTS Locations (
     userId INTEGER NOT NULL ,
     latitude DOUBLE PRECISION NOT NULL ,
     longitude DOUBLE PRECISION NOT NULL ,
-    FOREIGN KEY (userId) references Users(id) ON DELETE CASCADE,
-    CONSTRAINT unique_lat_long_pair UNIQUE (latitude, longitude)
+    FOREIGN KEY (userId) references Users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Sessions (

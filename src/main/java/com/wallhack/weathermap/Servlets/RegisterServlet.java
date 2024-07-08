@@ -36,7 +36,6 @@ public class RegisterServlet extends HttpServlet {
         }
 
         if (usersService.getUser(username).isPresent()){
-            log("Username already exists");
             resp.setStatus(409);
             mapper.writeValue(resp.getWriter(), new ErrorResponse(409,"Username already exists"));
             return;

@@ -8,6 +8,7 @@ import com.wallhack.weathermap.Service.LocationsService;
 import com.wallhack.weathermap.Service.SearchService;
 import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
+import jakarta.persistence.NoResultException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -19,7 +20,7 @@ import java.util.Optional;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
-@WebServlet(value = "/index")
+@WebServlet(value = "/main_page")
 public class MainPageServlet extends HttpServlet {
     private final ObjectMapper mapper = new ObjectMapper();
     private final LocationsService locationsService = new LocationsService();
@@ -36,9 +37,17 @@ public class MainPageServlet extends HttpServlet {
         responseWithMethod(this::processGetMainPageServlet, req, resp);
     }
 
-    private void processGetMainPageServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, URISyntaxException, InterruptedException {
+    private void processGetMainPageServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         prepareResponse(resp);
-        sessionsService.processCookies(this::allLocationsRender, resp, req, mapper, sessionsService);
+        try {
+            sessionsService.processCookies(this::allLocationsRender, resp, req, sessionsService);
+        } catch (NoResultException e) {
+            resp.setStatus(403);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
+        }catch (IOException | URISyntaxException | InterruptedException e) {
+            resp.setStatus(500);
+            mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
+        }
     }
 
     private void allLocationsRender(HttpServletResponse resp, CookieLocation cookieLocation) throws IOException, URISyntaxException, InterruptedException {

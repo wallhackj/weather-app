@@ -33,7 +33,7 @@ public class LocationsService {
     }
 
     public void updateLocation(LocationsPOJO location) {
-        locationsDAO.save(location);
+        locationsDAO.update(location);
     }
 
     public void deleteLocation(long id) {

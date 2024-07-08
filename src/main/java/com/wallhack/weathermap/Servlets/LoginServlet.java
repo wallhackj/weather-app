@@ -42,9 +42,10 @@ public class LoginServlet extends HttpServlet {
 
         if (user.isPresent()){
             if (user.get().getPassword().equals(password)){
+                setAndSaveSessionCookie(req, resp, user.get().getId());
+
                 resp.setStatus(200);
                 mapper.writeValue(resp.getWriter(), user.get());
-                setAndSaveSessionCookie(req, resp, user.get().getId());
                 sessionsService.saveSession(new SessionsPOJO(getWhenExpiersSessionTimestamp() ,user.get()));
             }else {
                 resp.setStatus(403);

@@ -21,6 +21,8 @@ public class ExtraUtils {
     }
 
     public static void responseWithMethod(ServletProcessor processor, HttpServletRequest req, HttpServletResponse resp) {
+        politicCORS(resp);
+
         try {
             processor.process(req, resp);
         } catch (Exception e) {
