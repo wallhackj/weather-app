@@ -1,9 +1,8 @@
 package com.wallhack.weathermap.Servlets.WeatherServlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.DAO.UsersDAO;
-import com.wallhack.weathermap.Model.APIDTO.APIWeatherDTO;
-import com.wallhack.weathermap.Model.DTO.CookieLocation;
+import com.wallhack.weathermap.Model.apiDTO.APIWeatherDTO;
+import com.wallhack.weathermap.Model.cookieDTO.CookieLocation;
 import com.wallhack.weathermap.Model.LocationsPOJO;
 import com.wallhack.weathermap.Model.UsersPOJO;
 import com.wallhack.weathermap.Service.LocationsService;
@@ -21,12 +20,10 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
-import static com.wallhack.weathermap.utils.ExtraUtils.responseWithMethod;
 
 @WebServlet(value = "/search_bar")
 public class SearchWeatherServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
-    private final ObjectMapper mapper = new ObjectMapper();
     private final LocationsService locationsService = new LocationsService();
     private final UsersDAO usersDAO = new UsersDAO();
     private final SessionsService sessionsService =  new SessionsService();
@@ -34,17 +31,17 @@ public class SearchWeatherServlet extends HttpServlet {
 
     public SearchWeatherServlet() {
         this.sessionsService.deleteExpiredSessions();
-        this.mapper.findAndRegisterModules();
+        MAPPER.findAndRegisterModules();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        responseWithMethod(this::processGetSearchServlet, req, resp);
+       doReq(this::processGetSearchServlet, req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        responseWithMethod(this::processPostSearchServlet, req, resp);
+        doReq(this::processPostSearchServlet, req, resp);
     }
 
     private void processPostSearchServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -56,7 +53,7 @@ public class SearchWeatherServlet extends HttpServlet {
 
         if (isEmpty("1", name) && isEmpty(latitude, longitude)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Bad Request"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400, "Bad Request"));
             return;
         }
 
@@ -65,13 +62,13 @@ public class SearchWeatherServlet extends HttpServlet {
             sessionsService.processCookies(this::addLocationToDB, resp, req, sessionsService);
         } catch (NoResultException e) {
             resp.setStatus(403);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
         } catch (NumberFormatException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Wrong parameters of latitude or longitude"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400, "Wrong parameters of latitude or longitude"));
         }catch (IOException | URISyntaxException | InterruptedException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
         }
     }
 
@@ -83,12 +80,12 @@ public class SearchWeatherServlet extends HttpServlet {
             if (currentLocation.get().getUser().getId() != cookieLocation.id()) {
                 var newLocation = new LocationsPOJO(localCookieLocation.lat(), localCookieLocation.lon(), localCookieLocation.name(), user.get());
                 resp.setStatus(HttpServletResponse.SC_OK);
-                mapper.writeValue(resp.getWriter(), newLocation);
+                MAPPER.writeValue(resp.getWriter(), newLocation);
                 locationsService.addLocation(newLocation);
 
                 } else {
                 resp.setStatus(HttpServletResponse.SC_OK);
-                mapper.writeValue(resp.getWriter(), currentLocation.get());
+                MAPPER.writeValue(resp.getWriter(), currentLocation.get());
             }
         }
     }
@@ -103,7 +100,7 @@ public class SearchWeatherServlet extends HttpServlet {
 
         if (isEmpty(location,"1")){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Param 'location' is required"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400, "Param 'location' is required"));
             return;
         }
 
@@ -129,11 +126,11 @@ public class SearchWeatherServlet extends HttpServlet {
 
         if (currentWeatherDTO.isPresent()) {
             resp.setStatus(HttpServletResponse.SC_OK);
-            mapper.writeValue(resp.getWriter(), currentWeatherDTO.get());
+            MAPPER.writeValue(resp.getWriter(), currentWeatherDTO.get());
 
         }else {
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(404, "Internal Server Error"));
         }
     }
 }

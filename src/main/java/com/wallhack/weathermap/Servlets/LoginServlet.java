@@ -22,7 +22,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        responseWithMethod(this::processGetLoginServlet, req, resp);
+       doReq(this::processGetLoginServlet, req, resp);
     }
 
     private void processGetLoginServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

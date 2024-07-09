@@ -1,8 +1,8 @@
 package com.wallhack.weathermap.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.Model.APIDTO.APIForecastDTO;
-import com.wallhack.weathermap.Model.APIDTO.APIWeatherDTO;
+import com.wallhack.weathermap.Model.apiDTO.APIForecastDTO;
+import com.wallhack.weathermap.Model.apiDTO.APIWeatherDTO;
 
 import java.io.IOException;
 import java.net.URI;

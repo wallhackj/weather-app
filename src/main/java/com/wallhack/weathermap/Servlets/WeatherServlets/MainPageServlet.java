@@ -1,8 +1,8 @@
 package com.wallhack.weathermap.Servlets.WeatherServlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.Model.APIDTO.APIWeatherDTO;
-import com.wallhack.weathermap.Model.DTO.CookieLocation;
+
+import com.wallhack.weathermap.Model.apiDTO.APIWeatherDTO;
+import com.wallhack.weathermap.Model.cookieDTO.CookieLocation;
 import com.wallhack.weathermap.Model.LocationsPOJO;
 import com.wallhack.weathermap.Service.LocationsService;
 import com.wallhack.weathermap.Service.SearchService;
@@ -22,31 +22,28 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
 @WebServlet(value = "/main_page")
 public class MainPageServlet extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
     private final LocationsService locationsService = new LocationsService();
     private final SearchService searchService = new SearchService();
-    private final SessionsService sessionsService =  new SessionsService();
+    private final SessionsService sessionsService = new SessionsService();
 
     public MainPageServlet() {
-        this.sessionsService.deleteExpiredSessions();
-        this.mapper.findAndRegisterModules();
+        MAPPER.findAndRegisterModules();
+        sessionsService.deleteExpiredSessions();
     }
+
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        responseWithMethod(this::processGetMainPageServlet, req, resp);
+        doReq(this::processGetMainPageServlet, req, resp);
     }
 
-    private void processGetMainPageServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void processGetMainPageServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, URISyntaxException, InterruptedException {
         prepareResponse(resp);
         try {
             sessionsService.processCookies(this::allLocationsRender, resp, req, sessionsService);
         } catch (NoResultException e) {
             resp.setStatus(403);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
-        }catch (IOException | URISyntaxException | InterruptedException e) {
-            resp.setStatus(500);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(500, "Internal Server Error"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(403, "Session expired"));
         }
     }
 
@@ -55,19 +52,20 @@ public class MainPageServlet extends HttpServlet {
 
         if (allLocationsOfUser.isEmpty()) {
             resp.setStatus(400);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "User dont have any location"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400, "User dont have any location"));
         } else {
             List<APIWeatherDTO> allWeatherInfo = new ArrayList<>();
-
-            for (LocationsPOJO location : allLocationsOfUser) {
-                Optional<APIWeatherDTO> locationsPOJO = searchService
-                        .searchWeatherByCoordinates(location.getLatitude(), location.getLongitude());
-                locationsPOJO.ifPresent(allWeatherInfo::add);
-            }
-
+            addAllLocationToArray(allLocationsOfUser, allWeatherInfo);
             resp.setStatus(200);
-            mapper.writeValue(resp.getWriter(), allWeatherInfo);
+            MAPPER.writeValue(resp.getWriter(), allWeatherInfo);
+        }
+    }
 
+    private void addAllLocationToArray(List<LocationsPOJO> allLocationsOfUser, List<APIWeatherDTO> allWeatherInfo) throws URISyntaxException, IOException, InterruptedException {
+        for (LocationsPOJO location : allLocationsOfUser) {
+            Optional<APIWeatherDTO> locationsPOJO = searchService
+                    .searchWeatherByCoordinates(location.getLatitude(), location.getLongitude());
+            locationsPOJO.ifPresent(allWeatherInfo::add);
         }
     }
 }

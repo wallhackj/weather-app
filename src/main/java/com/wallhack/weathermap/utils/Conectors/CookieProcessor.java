@@ -1,6 +1,6 @@
 package com.wallhack.weathermap.utils.Conectors;
 
-import com.wallhack.weathermap.Model.DTO.CookieLocation;
+import com.wallhack.weathermap.Model.cookieDTO.CookieLocation;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
