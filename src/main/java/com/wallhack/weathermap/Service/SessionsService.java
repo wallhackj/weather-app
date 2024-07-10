@@ -1,23 +1,19 @@
 package com.wallhack.weathermap.Service;
 
 import com.wallhack.weathermap.DAO.Session.SessionsDAO;
-import com.wallhack.weathermap.Model.DTO.CookieLocation;
+import com.wallhack.weathermap.Model.cookieDTO.CookieLocation;
 import com.wallhack.weathermap.Model.SessionsPOJO;
 import com.wallhack.weathermap.utils.Conectors.CookieProcessor;
 import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class SessionsService {
     private final SessionsDAO sessionsDAO = new SessionsDAO();
@@ -69,20 +65,25 @@ public class SessionsService {
         return now.isAfter(expiresAt);
     }
 
-    public void processCookies(CookieProcessor processor, HttpServletResponse resp, HttpServletRequest req, SessionsService sessionsService) throws IOException, URISyntaxException, InterruptedException {
+    public void processCookies(CookieProcessor processor, HttpServletResponse resp, HttpServletRequest req, SessionsService sessionsService) throws IOException, URISyntaxException, InterruptedException, NoResultException {
         Cookie[] cookies = req.getCookies();
+
         if (cookies != null) {
             for (Cookie cookie : req.getCookies()) {
-                if (cookie.getName().equals("sessionsId")) {
-                    HttpSession session = req.getSession(false);
 
-                    if (session != null && session.getAttribute("userId") != null) {
-                        long id = (long) session.getAttribute("userId");
-                        if (sessionsService.getSessionByUserId(id).isPresent()) {
-                            processor.proceed(resp,new CookieLocation(id,"1", 1,1));
-                        } else {
-                            throw new NoResultException("User is not present");
-                        }
+                if (cookie.getName().equals("sessionId")) {
+
+                    if (cookie.getValue() != null) {
+                        SessionsPOJO session = sessionsService
+                                .getSessionById(UUID.fromString(cookie.getValue()))
+                                .orElse(null);
+
+                        if (session != null) {
+                            processor.proceed(resp, new CookieLocation(
+                                    session.getUserId().getId()
+                                    , "1", 1,1));
+
+                        }else throw new NoResultException("User is not present");
                     }
                 }
             }

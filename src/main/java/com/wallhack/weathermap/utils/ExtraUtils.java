@@ -1,10 +1,18 @@
 package com.wallhack.weathermap.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.utils.Conectors.ServletProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
 
 public class ExtraUtils {
+    private static final Logger LOGGER = LogManager.getLogger(ExtraUtils.class);
+    public static final ObjectMapper MAPPER = new ObjectMapper();
+
     public static boolean isEmpty(String str, String str2) {
         return str == null || str2 == null || str.isEmpty() || str2.isEmpty();
     }
@@ -20,24 +28,23 @@ public class ExtraUtils {
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
     }
 
-    public static void responseWithMethod(ServletProcessor processor, HttpServletRequest req, HttpServletResponse resp) {
+    public static void doReq(ServletProcessor processor, HttpServletRequest req, HttpServletResponse resp) {
         politicCORS(resp);
 
         try {
             processor.process(req, resp);
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e){
+            handleResponseError(resp, e, 500 , "Internal Server Error");
         }
     }
 
-
-//    public static void handleResponseError(HttpServletResponse resp, Logger logger, ObjectMapper mapper, Exception e, int statusCode, String errorMessage) {
-//        logger.error("Error processing request", e);
-//        resp.setStatus(statusCode);
-//        try {
-//            mapper.writeValue(resp.getWriter(), new ErrorResponse(statusCode, errorMessage));
-//        } catch (IOException ex) {
-//            logger.error("Error writing error response", ex);
-//        }
-//    }
+    public static void handleResponseError(HttpServletResponse resp, Exception e, int statusCode, String errorMessage) {
+        LOGGER.error("Error processing request", e);
+        resp.setStatus(statusCode);
+        try {
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(statusCode, errorMessage));
+        } catch (IOException ex) {
+            LOGGER.error("Error writing error response", ex);
+        }
+    }
 }

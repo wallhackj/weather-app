@@ -1,7 +1,6 @@
 package com.wallhack.weathermap.Servlets.WeatherServlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.Model.APIDTO.APIForecastDTO;
+import com.wallhack.weathermap.Model.apiDTO.APIForecastDTO;
 import com.wallhack.weathermap.Service.SearchService;
 import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
@@ -19,45 +18,42 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 @WebServlet(value = "/forecasts")
 public class ForecastServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
-    private final ObjectMapper mapper = new ObjectMapper();
 
     public ForecastServlet() {
-        SessionsService sessionsService =  new SessionsService();
+        SessionsService sessionsService = new SessionsService();
         sessionsService.deleteExpiredSessions();
-        this.mapper.findAndRegisterModules();
+        MAPPER.findAndRegisterModules();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        responseWithMethod(this::processGetForecastServlet, req, resp);
+        doReq(this::processGetForecastServlet, req, resp);
     }
 
     private void processGetForecastServlet(HttpServletRequest req, HttpServletResponse resp) throws IOException, URISyntaxException, InterruptedException {
         prepareResponse(resp);
 
         var location = req.getParameter("location");
-        Optional<APIForecastDTO> fiveDaysForecast;
-
         if (isEmpty(location, "1")){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400, "Param 'location and user' is required"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400, "Param 'location and user' is required"));
             return;
         }
 
+        Optional<APIForecastDTO> fiveDaysForecast;
         if (location.contains(",")){
             String[] parts = location.split(",", 2);
             String city = parts[0].trim();
             String region = parts[1].trim();
-
             fiveDaysForecast = searchService.forecast5Day3HoursByCityAndRegion(city, region);
         }else fiveDaysForecast = searchService.forecast5Day3HoursByCity(location);
 
         if (fiveDaysForecast.isPresent() && fiveDaysForecast.get().hourlyForecast() != null){
             resp.setStatus(HttpServletResponse.SC_OK);
-            mapper.writeValue(resp.getWriter(), fiveDaysForecast.get());
+            MAPPER.writeValue(resp.getWriter(), fiveDaysForecast.get());
         }else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(404, "Not Found Forecast by City"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(404, "Not Found Forecast by City"));
         }
 
     }
