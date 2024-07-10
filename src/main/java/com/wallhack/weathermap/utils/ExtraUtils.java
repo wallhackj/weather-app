@@ -4,13 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.Servlets.ServletProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class ExtraUtils {
-    private static final Logger LOGGER = LogManager.getLogger(ExtraUtils.class);
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static boolean isEmpty(String str, String str2) {
@@ -39,12 +38,12 @@ public class ExtraUtils {
     }
 
     public static void handleResponseError(HttpServletResponse resp, Exception e, int statusCode) {
-        LOGGER.error("Error processing request", e);
+        log.error("Error processing request", e);
         resp.setStatus(statusCode);
         try {
             MAPPER.writeValue(resp.getWriter(), new ErrorResponse(statusCode,"Internal Server Error"));
         } catch (IOException ex) {
-            LOGGER.error("Error writing error response", ex);
+            log.error("Error writing error response", ex);
         }
     }
 }

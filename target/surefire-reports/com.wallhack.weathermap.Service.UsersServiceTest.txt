@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.wallhack.weathermap.Service.UsersServiceTest
--------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.642 s -- in com.wallhack.weathermap.Service.UsersServiceTest

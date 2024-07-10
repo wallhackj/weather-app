@@ -1,11 +1,11 @@
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\cookieDTO\CookieLocation.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\RegisterServlet.java
+C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Service\API_KEY_ACCESS.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\Session\SessionsDAO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\LoginServlet.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\ServletProcessor.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\UsersDAO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\LocationsPOJO.java
-C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\utils\API_KEY_ACCESS.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\SessionsPOJO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\Location\ICRUDLocations.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\apiDTO\CloudsDTO.java
@@ -33,3 +33,4 @@ C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\M
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\utils\ExtraUtils.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Model\apiDTO\MainDTO.java
 C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\DAO\ICRUDUsers.java
+C:\Users\SILVER\IdeaProjects\weather-app\src\main\java\com\wallhack\weathermap\Servlets\LogoutServlet.java

@@ -30,8 +30,10 @@ public class LogoutServlet extends HttpServlet {
             if (sessionsPOJO != null){
                 sessionsService.deleteSession(sessionsPOJO.getId());
                 session.invalidate();
+            }else {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                MAPPER.writeValue(resp.getWriter(), new ErrorResponse(404, "Session not found"));
             }
-
         }
 
         Cookie cookies = new Cookie("sessionId",null);
