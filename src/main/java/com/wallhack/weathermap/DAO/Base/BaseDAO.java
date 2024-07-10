@@ -1,6 +1,5 @@
 package com.wallhack.weathermap.DAO.Base;
 
-import com.wallhack.weathermap.utils.Conectors.PersistenceService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;

@@ -1,6 +1,5 @@
 package com.wallhack.weathermap.Servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.Model.SessionsPOJO;
 import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.Service.UsersService;
@@ -18,7 +17,6 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 public class LoginServlet extends HttpServlet {
     private final UsersService usersService = new UsersService();
     private final SessionsService sessionsService = new SessionsService();
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
@@ -34,7 +32,7 @@ public class LoginServlet extends HttpServlet {
 
         if (isEmpty(username, password)){
             resp.setStatus(400);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
             return;
         }
 
@@ -45,15 +43,15 @@ public class LoginServlet extends HttpServlet {
                 setAndSaveSessionCookie(req, resp, user.get().getId());
 
                 resp.setStatus(200);
-                mapper.writeValue(resp.getWriter(), user.get());
+                MAPPER.writeValue(resp.getWriter(), user.get());
                 sessionsService.saveSession(new SessionsPOJO(getWhenExpiersSessionTimestamp() ,user.get()));
             }else {
                 resp.setStatus(403);
-                mapper.writeValue(resp.getWriter(), new ErrorResponse(403, "Invalid password"));
+                MAPPER.writeValue(resp.getWriter(), new ErrorResponse(403, "Invalid password"));
             }
         }else {
             resp.setStatus(404);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(404,"User not found"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(404,"User not found"));
         }
     }
 

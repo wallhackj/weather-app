@@ -1,7 +1,7 @@
 package com.wallhack.weathermap.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.utils.Conectors.ServletProcessor;
+import com.wallhack.weathermap.Servlets.ServletProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
@@ -34,15 +34,15 @@ public class ExtraUtils {
         try {
             processor.process(req, resp);
         }catch (Exception e){
-            handleResponseError(resp, e, 500 , "Internal Server Error");
+            handleResponseError(resp, e, 500);
         }
     }
 
-    public static void handleResponseError(HttpServletResponse resp, Exception e, int statusCode, String errorMessage) {
+    public static void handleResponseError(HttpServletResponse resp, Exception e, int statusCode) {
         LOGGER.error("Error processing request", e);
         resp.setStatus(statusCode);
         try {
-            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(statusCode, errorMessage));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(statusCode,"Internal Server Error"));
         } catch (IOException ex) {
             LOGGER.error("Error writing error response", ex);
         }

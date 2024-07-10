@@ -3,7 +3,6 @@ package com.wallhack.weathermap.Service;
 import com.wallhack.weathermap.DAO.Session.SessionsDAO;
 import com.wallhack.weathermap.Model.cookieDTO.CookieLocation;
 import com.wallhack.weathermap.Model.SessionsPOJO;
-import com.wallhack.weathermap.utils.Conectors.CookieProcessor;
 import jakarta.persistence.NoResultException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,14 +42,9 @@ public class SessionsService {
     }
 
     public void deleteExpiredSessions() {
-        SessionsService sessionsService = new SessionsService();
-
-        List<SessionsPOJO> allSessions = sessionsService.getAllSessions();
-        for (SessionsPOJO session : allSessions) {
-            if (isSessionExpired(session)) {
-                sessionsService.deleteSession(session.getId());
-            }
-        }
+        getAllSessions().stream()
+                .filter(SessionsService::isSessionExpired)
+                .forEach(session -> deleteSession(session.getId()));
     }
 
     public static Timestamp getWhenExpiersSessionTimestamp(){

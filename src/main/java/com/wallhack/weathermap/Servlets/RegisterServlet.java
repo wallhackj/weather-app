@@ -1,6 +1,5 @@
 package com.wallhack.weathermap.Servlets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallhack.weathermap.Service.UsersService;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,7 +14,6 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 @WebServlet(value = "/register")
 public class RegisterServlet extends HttpServlet {
     private final UsersService usersService = new UsersService();
-    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
@@ -30,13 +28,13 @@ public class RegisterServlet extends HttpServlet {
         if (isEmpty(username, password)){
             resp.setStatus(400);
             log("Invalid username/password");
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400,"Username and password are required"));
             return;
         }
 
         if (usersService.getUser(username).isPresent()){
             resp.setStatus(409);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(409,"Username already exists"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(409,"Username already exists"));
             return;
         }
 
@@ -45,10 +43,10 @@ public class RegisterServlet extends HttpServlet {
 
         if (registeredUser != null) {
             resp.setStatus(200);
-            mapper.writeValue(resp.getWriter(), registeredUser);
+            MAPPER.writeValue(resp.getWriter(), registeredUser);
         } else {
             resp.setStatus(404);
-            mapper.writeValue(resp.getWriter(), new ErrorResponse(404, "Failed to retrieve registered user"));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(404, "Failed to retrieve registered user"));
         }
 
     }
