@@ -1,15 +1,20 @@
 package com.wallhack.weathermap.Servlets;
 
+import com.wallhack.weathermap.Model.SessionsPOJO;
+import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
 
+
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
 
 @WebServlet(value = "/logout")
 public class LogoutServlet extends HttpServlet {
+    private final SessionsService sessionsService = new SessionsService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         doReq(this::processGetLogoutServlet, req, resp);
@@ -20,7 +25,13 @@ public class LogoutServlet extends HttpServlet {
 
         HttpSession session = req.getSession(false);
         if (session != null) {
-            session.invalidate();
+            long userId = (long) session.getAttribute("userId");
+            SessionsPOJO sessionsPOJO = sessionsService.getSessionByUserId(userId).orElse(null);
+            if (sessionsPOJO != null){
+                sessionsService.deleteSession(sessionsPOJO.getId());
+                session.invalidate();
+            }
+
         }
 
         Cookie cookies = new Cookie("sessionId",null);

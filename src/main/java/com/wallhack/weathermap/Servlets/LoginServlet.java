@@ -8,7 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.Optional;
 
 import static com.wallhack.weathermap.Service.SessionsService.getWhenExpiersSessionTimestamp;
 import static com.wallhack.weathermap.utils.ExtraUtils.*;
@@ -40,11 +40,13 @@ public class LoginServlet extends HttpServlet {
 
         if (user.isPresent()){
             if (user.get().getPassword().equals(password)){
-                setAndSaveSessionCookie(req, resp, user.get().getId());
-
-                resp.setStatus(200);
-                MAPPER.writeValue(resp.getWriter(), user.get());
                 sessionsService.saveSession(new SessionsPOJO(getWhenExpiersSessionTimestamp() ,user.get()));
+                Optional<SessionsPOJO> session = sessionsService.getSessionByUserId(user.get().getId());
+                if (session.isPresent()){
+                    setAndSaveSessionCookie(req, resp, session.get());
+                    resp.setStatus(200);
+                    MAPPER.writeValue(resp.getWriter(), user.get());
+                }
             }else {
                 resp.setStatus(403);
                 MAPPER.writeValue(resp.getWriter(), new ErrorResponse(403, "Invalid password"));
@@ -55,10 +57,10 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private void setAndSaveSessionCookie(HttpServletRequest req, HttpServletResponse resp , long userId) {
-        HttpSession session = req.getSession();
-        session.setAttribute("userId", userId);
-        Cookie sessionCookie = new Cookie("sessionId", UUID.randomUUID().toString());
+    private void setAndSaveSessionCookie(HttpServletRequest req, HttpServletResponse resp , SessionsPOJO session) {
+        HttpSession getSession = req.getSession();
+        getSession.setAttribute("userId", session.getUserId().getId());
+        Cookie sessionCookie = new Cookie("sessionId", String.valueOf(session.getId()));
         sessionCookie.setMaxAge(30 * 60);
         resp.addCookie(sessionCookie);
     }

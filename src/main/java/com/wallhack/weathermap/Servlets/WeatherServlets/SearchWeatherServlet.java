@@ -1,6 +1,5 @@
 package com.wallhack.weathermap.Servlets.WeatherServlets;
 
-import com.wallhack.weathermap.DAO.UsersDAO;
 import com.wallhack.weathermap.Model.apiDTO.APIWeatherDTO;
 import com.wallhack.weathermap.Model.cookieDTO.CookieLocation;
 import com.wallhack.weathermap.Model.LocationsPOJO;
@@ -8,6 +7,7 @@ import com.wallhack.weathermap.Model.UsersPOJO;
 import com.wallhack.weathermap.Service.LocationsService;
 import com.wallhack.weathermap.Service.SearchService;
 import com.wallhack.weathermap.Service.SessionsService;
+import com.wallhack.weathermap.Service.UsersService;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.persistence.NoResultException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,7 +25,7 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 public class SearchWeatherServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
     private final LocationsService locationsService = new LocationsService();
-    private final UsersDAO usersDAO = new UsersDAO();
+    private final UsersService usersService = new UsersService();
     private final SessionsService sessionsService =  new SessionsService();
     private CookieLocation localCookieLocation;
 
@@ -58,7 +58,14 @@ public class SearchWeatherServlet extends HttpServlet {
         }
 
         try {
-            localCookieLocation = new CookieLocation(1, name, Double.parseDouble(latitude), Double.parseDouble(longitude));
+            var lat = Double.parseDouble(latitude);
+            var lon = Double.parseDouble(longitude);
+
+            if (searchService.searchWeatherByCoordinates(lat, lon).isPresent()){
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                MAPPER.writeValue(resp.getWriter(), new ErrorResponse(400, "Location already exists"));
+            }
+            localCookieLocation = new CookieLocation(1, name, lat, lon);
             sessionsService.processCookies(this::addLocationToDB, resp, req, sessionsService);
         } catch (NoResultException e) {
             resp.setStatus(403);
@@ -73,7 +80,7 @@ public class SearchWeatherServlet extends HttpServlet {
     }
 
     private void addLocationToDB(HttpServletResponse resp, CookieLocation cookieLocation) throws IOException {
-        Optional<UsersPOJO> user = usersDAO.findById(cookieLocation.id());
+        Optional<UsersPOJO> user = usersService.findUserById(cookieLocation.id());
         Optional<LocationsPOJO> currentLocation = locationsService.findLocationByName(localCookieLocation.name());
 
         if (user.isPresent() && currentLocation.isPresent()) {
