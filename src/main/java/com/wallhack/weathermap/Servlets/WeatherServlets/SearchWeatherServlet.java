@@ -29,11 +29,6 @@ public class SearchWeatherServlet extends HttpServlet {
     private final SessionsService sessionsService =  new SessionsService();
     private CookieLocation localCookieLocation;
 
-    public SearchWeatherServlet() {
-        this.sessionsService.deleteExpiredSessions();
-        MAPPER.findAndRegisterModules();
-    }
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
        doReq(this::processGetSearchServlet, req, resp);

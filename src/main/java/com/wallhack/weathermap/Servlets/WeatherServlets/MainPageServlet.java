@@ -26,11 +26,10 @@ public class MainPageServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
     private final SessionsService sessionsService = new SessionsService();
 
-    public MainPageServlet() {
-        MAPPER.findAndRegisterModules();
+    @Override
+    public void init() {
         sessionsService.deleteExpiredSessions();
     }
-
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {

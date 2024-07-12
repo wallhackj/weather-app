@@ -1,4 +1,4 @@
-package com.wallhack.weathermap.Servlets;
+package com.wallhack.weathermap.Servlets.Auth;
 
 import com.wallhack.weathermap.Model.SessionsPOJO;
 import com.wallhack.weathermap.Service.SessionsService;

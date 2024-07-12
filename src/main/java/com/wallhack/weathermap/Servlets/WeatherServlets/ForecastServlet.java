@@ -2,7 +2,6 @@ package com.wallhack.weathermap.Servlets.WeatherServlets;
 
 import com.wallhack.weathermap.Model.apiDTO.APIForecastDTO;
 import com.wallhack.weathermap.Service.SearchService;
-import com.wallhack.weathermap.Service.SessionsService;
 import com.wallhack.weathermap.utils.ErrorResponse;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -18,12 +17,6 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 @WebServlet(value = "/forecasts")
 public class ForecastServlet extends HttpServlet {
     private final SearchService searchService = new SearchService();
-
-    public ForecastServlet() {
-        SessionsService sessionsService = new SessionsService();
-        sessionsService.deleteExpiredSessions();
-        MAPPER.findAndRegisterModules();
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {

@@ -1,4 +1,4 @@
-package com.wallhack.weathermap.Servlets;
+package com.wallhack.weathermap.Servlets.Auth;
 
 import com.wallhack.weathermap.Model.SessionsPOJO;
 import com.wallhack.weathermap.Service.SessionsService;
@@ -17,6 +17,11 @@ import static com.wallhack.weathermap.utils.ExtraUtils.*;
 public class LoginServlet extends HttpServlet {
     private final UsersService usersService = new UsersService();
     private final SessionsService sessionsService = new SessionsService();
+
+    @Override
+    public void init() {
+        sessionsService.deleteExpiredSessions();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
