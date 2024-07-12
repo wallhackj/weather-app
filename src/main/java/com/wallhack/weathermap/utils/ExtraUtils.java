@@ -1,16 +1,15 @@
 package com.wallhack.weathermap.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallhack.weathermap.utils.Conectors.ServletProcessor;
+import com.wallhack.weathermap.Servlets.ServletProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class ExtraUtils {
-    private static final Logger LOGGER = LogManager.getLogger(ExtraUtils.class);
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
     public static boolean isEmpty(String str, String str2) {
@@ -34,17 +33,17 @@ public class ExtraUtils {
         try {
             processor.process(req, resp);
         }catch (Exception e){
-            handleResponseError(resp, e, 500 , "Internal Server Error");
+            handleResponseError(resp, e, 500);
         }
     }
 
-    public static void handleResponseError(HttpServletResponse resp, Exception e, int statusCode, String errorMessage) {
-        LOGGER.error("Error processing request", e);
+    public static void handleResponseError(HttpServletResponse resp, Exception e, int statusCode) {
+        log.error("Error processing request", e);
         resp.setStatus(statusCode);
         try {
-            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(statusCode, errorMessage));
+            MAPPER.writeValue(resp.getWriter(), new ErrorResponse(statusCode,"Internal Server Error"));
         } catch (IOException ex) {
-            LOGGER.error("Error writing error response", ex);
+            log.error("Error writing error response", ex);
         }
     }
 }

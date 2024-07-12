@@ -1,19 +1,17 @@
 package com.wallhack.weathermap.DAO.Base;
 
-import com.wallhack.weathermap.utils.Conectors.PersistenceService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+@Slf4j
 public abstract class BaseDAO<T> implements ICRUDContract<T> {
     private final Class<T> entityClass;
-    private static final Logger LOGGER = LogManager.getLogger(BaseDAO.class);
     private final EntityManagerFactory emf = PersistenceService.getInstance().getEntityManagerFactory();
 
     public BaseDAO(Class<T> entityClass) {
@@ -55,9 +53,9 @@ public abstract class BaseDAO<T> implements ICRUDContract<T> {
             } catch (RuntimeException e) {
                 if (transaction.isActive()) {
                     transaction.rollback();
-                    LOGGER.error("Transaction rollback due to: {}", e.getMessage(), e);
+                    log.error("Transaction rollback due to: {}", e.getMessage(), e);
                 }
-                LOGGER.error(e);
+                log.error(e.getMessage());
             }
         }
     }

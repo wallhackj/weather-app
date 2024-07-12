@@ -1,6 +1,7 @@
 package com.wallhack.weathermap.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.wallhack.weathermap.Model.apiDTO.APIForecastDTO;
 import com.wallhack.weathermap.Model.apiDTO.APIWeatherDTO;
 
@@ -12,10 +13,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Optional;
 
-import static com.wallhack.weathermap.utils.Conectors.API_KEY_ACCESS.apiKey;
-
 public class SearchService {
-    private final ObjectMapper jsonMapper = new ObjectMapper();
+    private final ObjectMapper jsonMapper = new JsonMapper();
+    private static final String key  = API_KEY_ACCESS.getApiKey();
 
     public Optional<APIWeatherDTO> searchWeatherByCity(String city) throws URISyntaxException, IOException, InterruptedException {
 //     https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
@@ -49,7 +49,7 @@ public class SearchService {
 
     private <T> Optional<T> sendRequest(String endpoint, Class<T> entityClass) throws URISyntaxException, IOException, InterruptedException {
         var request = HttpRequest.newBuilder()
-                .uri(new URI("https://api.openweathermap.org/data/2.5/" + endpoint + apiKey))
+                .uri(new URI("https://api.openweathermap.org/data/2.5/" + endpoint + key))
                 .GET()
                 .build();
         HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
