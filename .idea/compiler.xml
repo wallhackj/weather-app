@@ -11,4 +11,9 @@
       </profile>
     </annotationProcessing>
   </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="weathermap" options="--add-modules java.net.http,java.sql" />
+    </option>
+  </component>
 </project>
